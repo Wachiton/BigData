@@ -1,0 +1,62 @@
+import json
+import pprint as pp
+def estacion_en_lista(nombre_estacion, lista_estaciones):
+    for estacion in lista_estaciones:
+        if estacion.get("estacion") == nombre_estacion:
+            return True
+    return False
+def insertar_medicion(nombre_estacion, medida, lista_estaciones):
+    for estacion in lista_estaciones:
+        if estacion.get("estacion") == nombre_estacion:
+            estacion["mediciones"].append(medida)
+            return True
+    return False
+def crear_nueva_estacion (estacion):
+    nueva = dict()
+    nueva["estacion"] = estacion["estacion"]
+    nueva["latitud"] = estacion["latitud"]
+    nueva["longitud"] = estacion["longitud"]
+    nueva["mediciones"] = []
+    dict_medida = dict()
+    dict_medida["fecha"] = estacion["fecha"]
+    dict_medida["temp_max"] = estacion["temp_max"]
+    dict_medida["temp_min"] = estacion["temp_min"]
+    nueva["mediciones"].append(dict_medida)
+    return nueva
+def crear_medicion(estacion):
+    dict_medida = dict()
+    dict_medida["fecha"] = estacion["fecha"]
+    dict_medida["temp_max"] = estacion["temp_max"]
+    dict_medida["temp_min"] = estacion["temp_min"]
+    return dict_medida
+fichero_entrada = open("./datos2.json", encoding = "utf-8")
+fichero_salida = open("./datos2_sob.json", "w")
+datos_entrada = json.load(fichero_entrada)
+print("Entrada:")
+pp.pprint(datos_entrada[0:2])
+lista_salida = []
+for estacion in datos_entrada:
+    nombre_estacion = estacion["estacion"]
+    if estacion_en_lista(nombre_estacion, lista_salida):
+        medida = crear_medicion(estacion)
+        insertar_medicion(nombre_estacion, medida, lista_salida)
+    else:
+        nueva_estacion = crear_nueva_estacion(estacion)
+        lista_salida.append(nueva_estacion)
+print("Salida:")
+pp.pprint(lista_salida)
+json.dump(lista_salida, fichero_salida, indent = 4)
+
+-------------------------------------------------------------------------------------------
+
+import pandas as pd
+import csv
+estaciones = pd.read_json(r"./datos2.json")
+estaciones.to_csv (r"./estaciones.csv", index = None)
+
+with open('estaciones.csv', newline = '') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(";" .join(row))
+    
+print(row)
