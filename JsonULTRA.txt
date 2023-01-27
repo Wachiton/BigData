@@ -1,0 +1,142 @@
+
+## PPRINT ES UN MODULO QUE TIENE UNA FUNCION LLAMADA PPRINT, SIRVE PARA IMPRIMIR OBJETOS DE MANERA ESTRUCTURADA. SEGUIDO DE UN ALIAS COMO PP
+import json
+import pprint as pp
+
+## DEF USADO PARA DECLARAR UNA FUNCION
+## 'NOMBRE_ESTACION' ES UNA CADENA QUE REPRESENTA EL NOMBRE QUE BUSCAMOS // 'LISTA_ESTACIONES' ES UNA LISTA QUE CONTIENE DICCIONARIOS CON LA INFO DE
+CADA ESTACION DEL FICHERO DATOS2.JSON
+
+def estacion_en_lista(nombre_estacion, lista_estaciones):
+
+## LA FUNCION 'FOR' USA UN CICLO FOR PARA RECORRER LA LISTA DE ESTACIONES, USANDO GET PARA OBTENER EL VALOR ASOCIADO A LA ESTACION Y ASI CON TODOS LOS VALORES.
+SI ENCUENTRA ALGUNA REPETICION LA DEVUELVE CON TRUE, Y SI NO HAY FALSE.
+
+    for estacion in lista_estaciones:
+        if estacion.get("estacion") == nombre_estacion:
+            return True
+    return False
+
+## LA FUNCION 'INSERTAR_MEDICION' ES UNA FUNCION PERSONALIZADA PARA INSERTAR LA MEDICION DE UNA SUPERFICIE DENTRO DE LA LISTA DE ESTACIONES
+
+## 'NOMBRE_ESTACION' CADENA DE TEXTO REPRESENTA EL NOMBRE DE LA ESTACION // 'MEDIDA' ES EL VALOR NUMERICO QUE REPRESENTA LA MEDICION // 'LISTA_ESTACIONES' LISTA CON LOS
+DICCIONARIOS CON LA INFO DE CADA ESTACION.
+
+## LA FUNCION USA UN CICLO 'FOR' PARA RECORRER LA LISTA 'ESTACIONES', DENTRO DEL CICLO SE USA 'GET' PARA OBTENER EL VALOR ASIOCIADO A "ESTACION" // Y SE USA '.APPEND' POR SI
+SE ENCUENTRA ALGUNA COINCIDENCIA Y ASI AGREGAR LA MEDICION A LA LISTA
+
+def insertar_medicion(nombre_estacion, medida, lista_estaciones):
+    for estacion in lista_estaciones:
+        if estacion.get("estacion") == nombre_estacion:
+            estacion["mediciones"].append(medida)
+            return True
+    return False
+ 
+## CON LA FUNCION 'CREAR_NUEVA_ESTACION' VUELVE A SER UNA FUNCION CUSTOM QUE CREA UN NUEVO DICCIONARIO QUE REPRESENTA UNA ESTACION DE MEDICION
+
+def crear_nueva_estacion (estacion):
+
+## 'NUEVA' VA A SER EL NUEVO DICCIONARIO VACIO // LA SEGUNDA LINEA ASIGNA EL VALOR DE LA CLAVE "ESTACION" DEL DICCIONARIO 'ESTACION' COMO UNA ENTRADA A LA CLAVE "ESTACION"
+EN EL DICCIONARIO "NUEVA" // TERCERA LINEA ASIGNA EL VALOR DE LA CLAVE "LATITUD" SOBRE EL DICCIONARIO 'ESTACION' DE ENTRADA A LA CLAVE 'ESTACION' TAMBIEN SOBRE EL DICCIONARIO 
+"NUEVA" // Y ASI CON LAS DEMAS ENTRADAS 
+
+    nueva = dict()
+    nueva["estacion"] = estacion["estacion"]
+    nueva["latitud"] = estacion["latitud"]
+    nueva["longitud"] = estacion["longitud"]
+    nueva["mediciones"] = []
+
+## CREA UN DICCIONARIO VACIO LLAMADA "DICT_MEDIDA" // VALOR CLAVE "FECHA" DEL DICCIONARIO 'ESTACION' DE ENTRADA DE CLAVE "FECHA" SOBRE EL DICCIONARIO "DICT_MEDIDA", ASI SE 
+COPIA EL VALOR DE DICCIONARIO "FECHA" EN LA ENTRADA VACIA E IGUAL CON LAS OTRAS ENTRADAS.
+
+    dict_medida = dict()
+    dict_medida["fecha"] = estacion["fecha"]
+    dict_medida["temp_max"] = estacion["temp_max"]
+    dict_medida["temp_min"] = estacion["temp_min"]
+    nueva["mediciones"].append(dict_medida)
+    return nueva
+
+## FUNCION "CREAR_MEDICION" TIENE COMO OBJETIVO CREAR UN NUEVO DICCIONARIO "DICT_MEDIDA" Y ALMACENAR LA INFO ASIGNADA // AL IGUAL QUE EXPLICADO ANTERIORMENTE SE ASIGNA EL 
+VALOR DE LA CLAVE "FECHA" DEL DICCIONARIO 'ESTACION' CON LA ENTRADA A LA CLAVE "FECHA" DEL NUEVO DICCIONARIO "DICT_MEDIDA" // LO MISMO HACE LA FUNCION PARA ALMACENAR INFO 
+DE LAS TEMPERATURAS MAXIMAS Y MINIMAS.
+
+def crear_medicion(estacion):
+    dict_medida = dict()
+    dict_medida["fecha"] = estacion["fecha"]
+    dict_medida["temp_max"] = estacion["temp_max"]
+    dict_medida["temp_min"] = estacion["temp_min"]
+    return dict_medida
+
+## LA PRIMERA ENTRADA ABRE EL ARCHIVO "DATOS2.JSON" POR DEFECTO Y LE ASIGNA UNA VARIABLE LLAMADA "FIHCERO_ENTRADA" //
+## LA SEGUNDA ABRE UN ARCHIVO LLAMADO "DATOS2_SOB.JSON" EN MODO ESCRITURA Y LO ASIGNA A UNA VARIABLE LLAMADA "FICHERO_SALIDA" //
+## SE USA LA FUNCION "JSON.LOAD" PARA CARGAR LOS DATOS DEL ARCHIVO "FIHCERO_ENTRADA" EN LA VARIABLE "FICHERO_SALIDA" Y POR ULTIMO "ENTRADA" ES IMPRIMIDA EN CONSOLA //
+## PPRINT SACA LOS DATOS ESTRUCTURADOS
+
+fichero_entrada = open("./datos2.json", encoding = "utf-8")
+fichero_salida = open("./datos2_sob.json", "w")
+datos_entrada = json.load(fichero_entrada)
+print("Entrada:")
+pp.pprint(datos_entrada[0:2])
+lista_salida = []
+
+## BUCLE "FOR" QUE ITERA SOBRE LA LISTA "DATOS_ENTRADA" DE DONDE SE SACA EL NOMBRE DE LA ESTACION Y USA LA FUNCION "ESTACION_EN_LISTA" ASI COMPRUEBA SI EXISTE ALGUNA CON 
+EL MISMO NOMBRE EN "LISTA_SALIDA". SI EXISTE CON LA FUNCION "CREAR_MEDICION" CREA UNA NUEVA CON LOS DATOS DE ESTA ESTACION USANDO LA FUNCION "INSERTAR_MEDICION" AGREGANDOLA
+A LA ESTACION EXISTENTE EN "LISTA_SALIDA" // SI NO EXISTE SE USA LA FUNCION "CREAR_NUEVA_ESTACION" PARA CREAR LA ESTACION CON SUS DATOS Y SEA AGREGADA A LA "LISTA_SALIDA"
+FINALMENTE EL CODIGO IMPRIME "SALIDA" USANDO LA FUNCION "JSON.DUMP" ESCRIBIENDO "LISTA_SALIDA" SOBRE UN ARCHIVO DE SALIDA EN FORMATO JSON CON UNA IDENTACION DE 4 ESPACIOS
+
+
+for estacion in datos_entrada:
+    nombre_estacion = estacion["estacion"]
+    if estacion_en_lista(nombre_estacion, lista_salida):
+        medida = crear_medicion(estacion)
+        insertar_medicion(nombre_estacion, medida, lista_salida)
+    else:
+        nueva_estacion = crear_nueva_estacion(estacion)
+        lista_salida.append(nueva_estacion)
+print("Salida:")
+pp.pprint(lista_salida)
+json.dump(lista_salida, fichero_salida, indent = 4)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## IMPORTAMOS LIBRERIA PANDAS Y CSV
+
+import pandas as pd
+import csv
+
+## UTILIZA LA FUNCION PARA LEER EL ARCHIVO "./datos2.json" ALMACENANDOLO EN LA VARIABLE "ESTACIONES" // UTILIZANDO LA FUNCION "TO_CSV" ESCRIBE EL CONTENIDO DE "ESTACIONES"
+EN UN ARCHIVO "estaciones.csv" SIN AGREGAR UN INDICE
+
+estaciones = pd.read_json(r"./datos2.json")
+estaciones.to_csv (r"./estaciones.csv", index = None)
+
+## "WITH OPEN" PARA ABRIR EL ARCHIVO EN MODO LECTURA USANDO "CSV.READER" DONDE SE PUEDAN ITERAR TODAS LAS FILAS DEL ARCHIVO CSV SOBRE LA SPREADSHEET DE LIBREOFFICE //
+SE USA UN BUCLE FOR PARA ITERAR CADA FILA DE "READER" SEGUIDO DE LA FUNCION "JOIN" QUE SIRVE PARA UNIR CADA ELEMENTO DE UNA CADENA SEPARADOS POR EL ";"
+
+with open('estaciones.csv', newline = '') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(";" .join(row))
+    
+print(row)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## USANDO LA LIBRERIA DE PANDAS AGREGAMOS UNA FUNCION PARA ELIMINAR DUPLICADOS TODO ESTO ANTES DE REALIZAR LA CONVERSION DE JSON A CSV
+
+import pandas as pd
+def eliminar_duplicados(json_file):
+    estaciones = pd.read_json(json_file)
+    estaciones = estaciones.drop_duplicates()
+    return estaciones
+
+estaciones_sin_duplicados = eliminar_duplicados(r"./datos2.json")
+estaciones_sin_duplicados.to_csv (r"./estaciones.csv", index = None)
+
+
+
+
+
+
+
+
+
